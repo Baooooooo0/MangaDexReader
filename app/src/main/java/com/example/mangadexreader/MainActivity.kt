@@ -1,17 +1,23 @@
 package com.example.mangadexreader
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,12 +28,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.mangadexreader.data.MangaModels
 import com.example.mangadexreader.ui.mainscreen.MangaListUiState
 import com.example.mangadexreader.ui.mainscreen.MangaListViewModel
@@ -121,17 +129,44 @@ fun MangaList(mangaDataList: List<MangaModels.MangaData>) {
  */
 @Composable
 fun MangaListItem(manga: MangaModels.MangaData) {
+    val coverFileName = manga.coverFileName
+    val imageUrl: String? =
+        if (
+            coverFileName != null
+        ){
+            "https://uploads.mangadex.org/covers/${manga.id}/${coverFileName}.256.jpg"
+        } else{
+            null
+        }
+
+    Log.d("MangaListItemDebug", "Title: ${manga.attributes.title["en"]}, Image URL: $imageUrl")
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                imageUrl,
+                "Manga cover",
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .weight(0.5f)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
             // Lấy tiêu đề tiếng Anh, nếu không có thì lấy tiêu đề đầu tiên tìm thấy
             val title = manga.attributes.title["en"] ?: manga.attributes.title.values.firstOrNull() ?: "No Title"
             Text(
                 text = title,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .weight(1.5f)
             )
         }
     }

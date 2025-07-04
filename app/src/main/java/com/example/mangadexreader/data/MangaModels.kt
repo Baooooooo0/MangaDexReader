@@ -2,7 +2,7 @@ package com.example.mangadexreader.data
 import kotlinx.serialization.Serializable
 
 class MangaModels {
-    
+
     /**
      * Lớp bao bọc toàn bộ phản hồi từ API danh sách manga.
      */
@@ -24,7 +24,7 @@ class MangaModels {
         val relationships: List<Relationship> // Mối quan hệ, dùng để tìm ảnh bìa
     ){
         val coverFileName: String?
-            get() = relationships.firstOrNull{it.type == "cover_art"}?.attributes?.filename
+            get() = relationships.firstOrNull{it.type == "cover_art"}?.attributes?.fileName
     }
 
     /**
@@ -54,5 +54,5 @@ class MangaModels {
 
 @Serializable
     data class CoverAttribute(
-        val filename: String
+        val fileName: String? = null
     )
