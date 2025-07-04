@@ -1,0 +1,58 @@
+package com.example.mangadexreader.data
+import kotlinx.serialization.Serializable
+
+class MangaModels {
+    
+    /**
+     * Lớp bao bọc toàn bộ phản hồi từ API danh sách manga.
+     */
+    @Serializable
+    data class MangaListResponse(
+        val result: String,
+        val data: List<MangaData>, // Một danh sách các đối tượng truyện
+        val total: Int
+    )
+
+    /**
+     * Đại diện cho một đối tượng truyện trong mảng "data".
+     */
+    @Serializable
+    data class MangaData(
+        val id: String, // ID duy nhất của truyện
+        val type: String,
+        val attributes: MangaAttributes, // Các thuộc tính chi tiết của truyện
+        val relationships: List<Relationship> // Mối quan hệ, dùng để tìm ảnh bìa
+    ){
+        val coverFileName: String?
+            get() = relationships.firstOrNull{it.type == "cover_art"}?.attributes?.filename
+    }
+
+    /**
+     * Chứa các thuộc tính chi tiết như tên, mô tả.
+     * Chúng ta sử dụng Map<String, String> vì API trả về nhiều ngôn ngữ (ví dụ: "en", "ja").
+     * Dấu '?' cho biết trường đó có thể là null (không tồn tại trong phản hồi của API).
+     */
+    @Serializable
+    data class MangaAttributes(
+        val title: Map<String, String>,
+        val description: Map<String, String>,
+        val year: Int? = null, // Có thể không có năm
+        val status: String? = null // Ví dụ: "ongoing", "completed"
+    )
+
+    /**
+     * Đại diện cho một đối tượng trong mảng "relationships".
+     * Chúng ta chỉ quan tâm đến những relationship có type là "cover_art".
+     */
+    @Serializable
+    data class Relationship(
+        val id: String,
+        val type: String,
+        val attributes: CoverAttribute? = null
+    )
+}
+
+@Serializable
+    data class CoverAttribute(
+        val filename: String
+    )
