@@ -1,5 +1,6 @@
 package com.example.mangadexreader.data
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -12,5 +13,14 @@ interface MangaApiService {
      */
     @GET("manga")
     suspend fun getMangaList(@Query("includes[]") includes:String="cover_art"): MangaModels.MangaListResponse
+
+    /**
+     * Lấy thông tin chi tiết của một truyện dựa vào ID.
+     */
+    @GET("manga/{id}")
+    suspend fun getMangaDetail(
+        @Path("id") mangaId: String,
+        @Query("includes[]") includes: String = "cover_art"
+    ): MangaModels.MangaDetailResponse
 
 }

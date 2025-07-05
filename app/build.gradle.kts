@@ -62,8 +62,10 @@ dependencies {
 
     // Retrofit để gọi API
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
     // Kotlinx Serialization Converter để Retrofit hiểu JSON
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
+
     // OkHttp Logging Interceptor để gỡ lỗi (debug) các cuộc gọi mạng
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
@@ -76,4 +78,7 @@ dependencies {
 
     // Coil để tải ảnh từ URL cho Jetpack Compose
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Navigation cho Jetpack Compose
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 }

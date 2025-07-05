@@ -18,4 +18,11 @@ class MangaRepository {
     suspend fun getMangaList(): MangaModels.MangaListResponse {
         return apiService.getMangaList()
     }
+
+    /**
+     * Gọi service để lấy thông tin chi tiết của truyện.
+     */
+    suspend fun getMangaDetail(mangaId: String): MangaModels.MangaDetailResponse {
+        return apiService.getMangaDetail(mangaId = mangaId)
+    }
 }

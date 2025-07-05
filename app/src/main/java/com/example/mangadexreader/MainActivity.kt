@@ -4,16 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -35,8 +34,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.example.mangadexreader.data.MangaModels
+import com.example.mangadexreader.navigation.ScreenRoutes
+import com.example.mangadexreader.ui.detailscreen.MangaDetailScreen
 import com.example.mangadexreader.ui.mainscreen.MangaListUiState
 import com.example.mangadexreader.ui.mainscreen.MangaListViewModel
 import com.example.mangadexreader.ui.theme.MangadexReaderTheme
@@ -50,13 +57,31 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val navController = rememberNavController()
                     // Lấy instance của ViewModel
                     val mangaViewModel: MangaListViewModel = viewModel()
                     // Lắng nghe và chuyển đổi StateFlow thành State mà Compose có thể sử dụng
                     val uiState by mangaViewModel.uiState.collectAsStateWithLifecycle()
 
                     // Gọi Composable chính của màn hình, truyền vào trạng thái hiện tại
-                    MangaListScreen(uiState = uiState)
+                    NavHost(
+                        navController = navController,
+                        startDestination = ScreenRoutes.MangaList
+                    ){
+                        composable(route = ScreenRoutes.MangaList){
+                            val mangaViewModel: MangaListViewModel = viewModel()
+                            val uiState by mangaViewModel.uiState.collectAsStateWithLifecycle()
+
+                            MangaListScreen(uiState = uiState, navController = navController)
+
+                        }
+
+                        composable(
+                            route = ScreenRoutes.MangaDetail,
+                            listOf(navArgument("mangaId"){val type = NavType.StringType})){
+                            MangaDetailScreen()
+                        }
+                    }
                 }
             }
         }
@@ -67,11 +92,18 @@ class MainActivity : ComponentActivity() {
  * Composable chính, quyết định hiển thị gì dựa trên trạng thái của UI
  */
 @Composable
-fun MangaListScreen(uiState: MangaListUiState) {
+fun MangaListScreen(uiState: MangaListUiState, navController: NavController) {
     // Sử dụng 'when' để xử lý từng trạng thái một cách tường minh
     when (uiState) {
         is MangaListUiState.Loading -> LoadingScreen()
-        is MangaListUiState.Success -> MangaList(mangaDataList = uiState.mangaList)
+        is MangaListUiState.Success -> MangaList(
+            mangaDataList = uiState.mangaList,
+            onItemClick = {mangaId ->
+                navController.navigate(
+                    ScreenRoutes.MangaDetail.replace("{mangaId}", mangaId)
+                )
+            }
+        )
         is MangaListUiState.Error -> ErrorScreen(message = uiState.message)
     }
 }
@@ -111,7 +143,7 @@ fun ErrorScreen(message: String) {
  * Màn hình hiển thị danh sách truyện khi tải thành công
  */
 @Composable
-fun MangaList(mangaDataList: List<MangaModels.MangaData>) {
+fun MangaList(mangaDataList: List<MangaModels.MangaData>, onItemClick: (String) -> Unit) {
     // LazyColumn chỉ render những item đang hiển thị trên màn hình, rất hiệu quả cho danh sách dài
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -119,7 +151,10 @@ fun MangaList(mangaDataList: List<MangaModels.MangaData>) {
         verticalArrangement = Arrangement.spacedBy(8.dp) // Khoảng cách giữa các item
     ) {
         items(mangaDataList) { manga ->
-            MangaListItem(manga = manga)
+            MangaListItem(
+                manga = manga,
+                onItemClick = { onItemClick(manga.id )}
+            )
         }
     }
 }
@@ -128,7 +163,7 @@ fun MangaList(mangaDataList: List<MangaModels.MangaData>) {
  * Composable cho một item truyện trong danh sách
  */
 @Composable
-fun MangaListItem(manga: MangaModels.MangaData) {
+fun MangaListItem(manga: MangaModels.MangaData, onItemClick: (String) -> Unit) {
     val coverFileName = manga.coverFileName
     val imageUrl: String? =
         if (
@@ -142,7 +177,9 @@ fun MangaListItem(manga: MangaModels.MangaData) {
     Log.d("MangaListItemDebug", "Title: ${manga.attributes.title["en"]}, Image URL: $imageUrl")
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .clickable { onItemClick(manga.id) }
+            .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(

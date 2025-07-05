@@ -13,6 +13,11 @@ class MangaModels {
         val total: Int
     )
 
+    @Serializable
+    data class MangaDetailResponse(
+        val data: MangaData
+    )
+
     /**
      * Đại diện cho một đối tượng truyện trong mảng "data".
      */
