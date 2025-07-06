@@ -1,6 +1,5 @@
 package com.example.mangadexreader.ui.detailscreen
 
-import android.util.EventLogTags.Description
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,14 +7,19 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,21 +29,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.mangadexreader.data.MangaModels
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MangaDetailScreen(){
+fun MangaDetailScreen(navController: NavController){
     val viewModel = viewModel<MangaDetailViewModel>()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    val titleText = when (val currentState = uiState.value) {
+                        is MangaDetailUiState.Success -> currentState.manga.attributes.title["en"] ?: "Chi tiết"
+                        is MangaDetailUiState.Loading -> "Đang tải..."
+                        is MangaDetailUiState.Error -> "Lỗi"
+                    }
+                    Text(titleText)
+                },
+                navigationIcon = {
+                    IconButton(onClick = {navController.popBackStack()}) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        }
+    ) {innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)){
     // Sửa ở đây: thêm .value
-    when (val currentState = uiState.value){ // Dùng `val currentState` để code dễ đọc hơn
+    when (val currentState = uiState.value) { // Dùng `val currentState` để code dễ đọc hơn
         is MangaDetailUiState.Loading -> LoadingState()
         // dùng currentState đã được gán giá trị
         is MangaDetailUiState.Success -> SuccessState(manga = currentState.manga)
         // dùng currentState đã được gán giá trị
         is MangaDetailUiState.Error -> ErrorState(message = currentState.message)
+            }
+        }
     }
 }
 

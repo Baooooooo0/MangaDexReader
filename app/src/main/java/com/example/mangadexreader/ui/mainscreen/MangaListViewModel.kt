@@ -19,15 +19,19 @@ class MangaListViewModel : ViewModel() {
     // Dòng state công khai, chỉ cho phép đọc, để UI quan sát
     val uiState: StateFlow<MangaListUiState> = _uiState.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow<String>("")
+
+    public val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
     // Khối init sẽ được gọi khi ViewModel được tạo lần đầu tiên
     init {
-        fetchMangaList()
+        fetchMangaList("")
     }
 
     /**
      * Hàm để lấy dữ liệu truyện tranh.
      */
-    fun fetchMangaList() {
+    fun fetchMangaList(query: String) {
         // Cập nhật trạng thái là Loading trước khi gọi API
         _uiState.value = MangaListUiState.Loading
 
@@ -35,7 +39,7 @@ class MangaListViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 // Gọi repository để lấy dữ liệu
-                val response = repository.getMangaList()
+                val response = repository.getMangaList(title = query)
                 // Nếu thành công, cập nhật trạng thái là Success cùng với dữ liệu
                 _uiState.value = MangaListUiState.Success(response.data)
             } catch (e: Exception) {
@@ -43,5 +47,9 @@ class MangaListViewModel : ViewModel() {
                 _uiState.value = MangaListUiState.Error(e.message ?: "Đã có lỗi không xác định xảy ra")
             }
         }
+    }
+
+    fun onSearchQueryChanged(newQuery: String){
+        _searchQuery.value = newQuery
     }
 }

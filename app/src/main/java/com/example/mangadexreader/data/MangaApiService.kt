@@ -12,7 +12,7 @@ interface MangaApiService {
      * Lấy một danh sách truyện từ API.
      */
     @GET("manga")
-    suspend fun getMangaList(@Query("includes[]") includes:String="cover_art"): MangaModels.MangaListResponse
+    suspend fun getMangaList(@Query("includes[]") includes:String="cover_art", @Query("title") title:String?): MangaModels.MangaListResponse
 
     /**
      * Lấy thông tin chi tiết của một truyện dựa vào ID.

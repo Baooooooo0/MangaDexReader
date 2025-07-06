@@ -15,8 +15,8 @@ class MangaRepository {
      * Gọi API để lấy danh sách truyện.
      * Đây là một suspend function vì nó gọi một suspend function khác từ ApiService.
      */
-    suspend fun getMangaList(): MangaModels.MangaListResponse {
-        return apiService.getMangaList()
+    suspend fun getMangaList(title: String?): MangaModels.MangaListResponse {
+        return apiService.getMangaList(title = title)
     }
 
     /**

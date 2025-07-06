@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,10 +21,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -44,9 +51,11 @@ import coil.compose.AsyncImage
 import com.example.mangadexreader.data.MangaModels
 import com.example.mangadexreader.navigation.ScreenRoutes
 import com.example.mangadexreader.ui.detailscreen.MangaDetailScreen
+import com.example.mangadexreader.ui.detailscreen.MangaDetailViewModel
 import com.example.mangadexreader.ui.mainscreen.MangaListUiState
 import com.example.mangadexreader.ui.mainscreen.MangaListViewModel
 import com.example.mangadexreader.ui.theme.MangadexReaderTheme
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,11 +67,6 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    // Lấy instance của ViewModel
-                    val mangaViewModel: MangaListViewModel = viewModel()
-                    // Lắng nghe và chuyển đổi StateFlow thành State mà Compose có thể sử dụng
-                    val uiState by mangaViewModel.uiState.collectAsStateWithLifecycle()
-
                     // Gọi Composable chính của màn hình, truyền vào trạng thái hiện tại
                     NavHost(
                         navController = navController,
@@ -72,14 +76,14 @@ class MainActivity : ComponentActivity() {
                             val mangaViewModel: MangaListViewModel = viewModel()
                             val uiState by mangaViewModel.uiState.collectAsStateWithLifecycle()
 
-                            MangaListScreen(uiState = uiState, navController = navController)
+                            MangaListScreen(uiState = uiState, navController = navController, viewModel = viewModel())
 
                         }
 
                         composable(
                             route = ScreenRoutes.MangaDetail,
-                            listOf(navArgument("mangaId"){val type = NavType.StringType})){
-                            MangaDetailScreen()
+                            arguments = listOf(navArgument("mangaId"){type = NavType.StringType})){
+                            MangaDetailScreen(navController = navController)
                         }
                     }
                 }
@@ -91,22 +95,52 @@ class MainActivity : ComponentActivity() {
 /**
  * Composable chính, quyết định hiển thị gì dựa trên trạng thái của UI
  */
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MangaListScreen(uiState: MangaListUiState, navController: NavController) {
-    // Sử dụng 'when' để xử lý từng trạng thái một cách tường minh
-    when (uiState) {
-        is MangaListUiState.Loading -> LoadingScreen()
-        is MangaListUiState.Success -> MangaList(
-            mangaDataList = uiState.mangaList,
-            onItemClick = {mangaId ->
-                navController.navigate(
-                    ScreenRoutes.MangaDetail.replace("{mangaId}", mangaId)
-                )
+fun MangaListScreen(uiState: MangaListUiState, navController: NavController, viewModel: MangaListViewModel) {
+
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = searchQuery) {
+        delay(500L) // Chờ nửa giây
+        viewModel.fetchMangaList(searchQuery)
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Mangadex")})
+        }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            TextField(
+                searchQuery,
+                onValueChange = {newQuery -> viewModel.onSearchQueryChanged(newQuery)},
+                label = { Text("Tim kiem truyen...")},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+            // Sử dụng 'when' để xử lý từng trạng thái một cách tường minh
+            Box(){
+                when (uiState) {
+                    is MangaListUiState.Loading -> LoadingScreen()
+                    is MangaListUiState.Success ->
+                        MangaList(
+                            mangaDataList = uiState.mangaList,
+                            onItemClick = { mangaId ->
+                                navController.navigate(
+                                    ScreenRoutes.MangaDetail.replace("{mangaId}", mangaId)
+                                )
+                            }
+                        )
+                    is MangaListUiState.Error -> ErrorScreen(message = uiState.message)
+                }
             }
-        )
-        is MangaListUiState.Error -> ErrorScreen(message = uiState.message)
+        }
     }
 }
+
 
 /**
  * Màn hình hiển thị khi đang tải dữ liệu
