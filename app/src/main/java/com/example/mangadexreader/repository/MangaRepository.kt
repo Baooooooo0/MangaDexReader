@@ -1,6 +1,7 @@
 package com.example.mangadexreader.repository
 
 import com.example.mangadexreader.data.ApiClient
+import com.example.mangadexreader.data.ChapterListResponse
 import com.example.mangadexreader.data.MangaModels
 
 /**
@@ -15,8 +16,8 @@ class MangaRepository {
      * Gọi API để lấy danh sách truyện.
      * Đây là một suspend function vì nó gọi một suspend function khác từ ApiService.
      */
-    suspend fun getMangaList(title: String?): MangaModels.MangaListResponse {
-        return apiService.getMangaList(title = title)
+    suspend fun getMangaList(title: String?, limit: Int, offset: Int): MangaModels.MangaListResponse {
+        return apiService.getMangaList(title = title, limit = limit, offset = offset)
     }
 
     /**
@@ -24,5 +25,10 @@ class MangaRepository {
      */
     suspend fun getMangaDetail(mangaId: String): MangaModels.MangaDetailResponse {
         return apiService.getMangaDetail(mangaId = mangaId)
+    }
+
+    suspend fun getChapterFeed(mangaId: String): ChapterListResponse {
+        val orderOptions = mapOf("order[chapter]" to "asc")
+        return apiService.getChapterFeed(mangaId, orderOptions)
     }
 }

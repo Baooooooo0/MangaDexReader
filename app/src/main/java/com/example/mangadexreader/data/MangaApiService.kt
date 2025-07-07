@@ -2,17 +2,22 @@ package com.example.mangadexreader.data
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 /**
  * Interface định nghĩa các điểm cuối (endpoints) của MangaDex API.
  */
 interface MangaApiService {
-
     /**
      * Lấy một danh sách truyện từ API.
      */
     @GET("manga")
-    suspend fun getMangaList(@Query("includes[]") includes:String="cover_art", @Query("title") title:String?): MangaModels.MangaListResponse
+    suspend fun getMangaList(
+        @Query("includes[]") includes:String="cover_art",
+        @Query("title") title:String?,
+        @Query("limit") limit:Int,
+        @Query("offset") offset:Int
+    ): MangaModels.MangaListResponse
 
     /**
      * Lấy thông tin chi tiết của một truyện dựa vào ID.
@@ -22,5 +27,10 @@ interface MangaApiService {
         @Path("id") mangaId: String,
         @Query("includes[]") includes: String = "cover_art"
     ): MangaModels.MangaDetailResponse
+
+    suspend fun getChapterFeed(
+        @Path("id") mangaId: String,
+        @QueryMap options: Map<String, String>
+    ): ChapterListResponse
 
 }

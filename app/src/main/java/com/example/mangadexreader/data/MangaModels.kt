@@ -1,8 +1,8 @@
 package com.example.mangadexreader.data
+import com.example.mangadexreader.data.MangaModels.MangaData
 import kotlinx.serialization.Serializable
 
 class MangaModels {
-
     /**
      * Lớp bao bọc toàn bộ phản hồi từ API danh sách manga.
      */
@@ -58,6 +58,27 @@ class MangaModels {
 }
 
 @Serializable
-    data class CoverAttribute(
-        val fileName: String? = null
-    )
+data class CoverAttribute(
+    val fileName: String? = null
+)
+
+@Serializable
+data class ChapterListResponse(
+    val data: List<ChapterData>
+)
+
+@Serializable
+data class ChapterData(
+    val id: String,
+    val type: String,
+    val attributes: ChapterAttributes
+)
+
+@Serializable
+data class ChapterAttributes(
+    val title: String?,
+    val chapter: String?,
+    val pages: Int,
+    val translatedLanguage: String
+)
+
