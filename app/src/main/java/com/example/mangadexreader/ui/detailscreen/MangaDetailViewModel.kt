@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mangadexreader.data.ChapterData
+import com.example.mangadexreader.data.MangaModels.ChapterData
 import com.example.mangadexreader.repository.MangaRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,7 +51,8 @@ class MangaDetailViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 val chapterResponse = repository.getChapterFeed(mangaId)
                 _chapterListState.value = chapterResponse.data
             } catch (e: Exception){
-                Log.d("Chapter", "fetch Chapter Error")
+                // trong khối catch
+                Log.e("ChapterError", "Lỗi khi tải chương: ${e.message}")
             }
         }
     }

@@ -55,6 +55,26 @@ class MangaModels {
         val type: String,
         val attributes: CoverAttribute? = null
     )
+
+    @Serializable
+    data class ChapterListResponse(
+        val data: List<ChapterData>
+    )
+
+    @Serializable
+    data class ChapterData(
+        val id: String,
+        val type: String,
+        val attributes: ChapterAttributes
+    )
+
+    @Serializable
+    data class ChapterAttributes(
+        val title: String?,
+        val chapter: String?,
+        val pages: Int,
+        val translatedLanguage: String
+    )
 }
 
 @Serializable
@@ -62,23 +82,5 @@ data class CoverAttribute(
     val fileName: String? = null
 )
 
-@Serializable
-data class ChapterListResponse(
-    val data: List<ChapterData>
-)
 
-@Serializable
-data class ChapterData(
-    val id: String,
-    val type: String,
-    val attributes: ChapterAttributes
-)
-
-@Serializable
-data class ChapterAttributes(
-    val title: String?,
-    val chapter: String?,
-    val pages: Int,
-    val translatedLanguage: String
-)
 

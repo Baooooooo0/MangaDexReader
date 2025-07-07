@@ -1,7 +1,7 @@
 package com.example.mangadexreader.repository
 
 import com.example.mangadexreader.data.ApiClient
-import com.example.mangadexreader.data.ChapterListResponse
+import com.example.mangadexreader.data.MangaModels.ChapterListResponse
 import com.example.mangadexreader.data.MangaModels
 
 /**

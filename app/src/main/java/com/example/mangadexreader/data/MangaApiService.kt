@@ -28,9 +28,10 @@ interface MangaApiService {
         @Query("includes[]") includes: String = "cover_art"
     ): MangaModels.MangaDetailResponse
 
+    @GET("manga/{id}/feed")
     suspend fun getChapterFeed(
         @Path("id") mangaId: String,
         @QueryMap options: Map<String, String>
-    ): ChapterListResponse
+    ): MangaModels.ChapterListResponse
 
 }

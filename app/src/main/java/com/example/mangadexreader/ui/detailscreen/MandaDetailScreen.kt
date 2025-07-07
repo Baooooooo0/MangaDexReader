@@ -1,6 +1,7 @@
 package com.example.mangadexreader.ui.detailscreen
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -11,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -38,6 +41,7 @@ import com.example.mangadexreader.data.MangaModels
 fun MangaDetailScreen(navController: NavController){
     val viewModel = viewModel<MangaDetailViewModel>()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val chapterList by viewModel.chapterListState.collectAsStateWithLifecycle()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -65,7 +69,7 @@ fun MangaDetailScreen(navController: NavController){
     when (val currentState = uiState.value) { // Dùng `val currentState` để code dễ đọc hơn
         is MangaDetailUiState.Loading -> LoadingState()
         // dùng currentState đã được gán giá trị
-        is MangaDetailUiState.Success -> SuccessState(manga = currentState.manga)
+        is MangaDetailUiState.Success -> SuccessState(manga = currentState.manga, chapterList = chapterList)
         // dùng currentState đã được gán giá trị
         is MangaDetailUiState.Error -> ErrorState(message = currentState.message)
             }
@@ -84,7 +88,7 @@ fun LoadingState(){
 }
 
 @Composable
-fun SuccessState(manga: MangaModels.MangaData){
+fun SuccessState(manga: MangaModels.MangaData, chapterList: List<MangaModels.ChapterData>){
     val coverFileName = manga.coverFileName
     val imageUrl: String? =
         if (
@@ -120,9 +124,34 @@ fun SuccessState(manga: MangaModels.MangaData){
                 .padding(15.dp)
         )
 
+        Text(
+            "Chapters",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(16.dp)
+        )
+
+        chapterList.forEach { chapter ->
+            // Với mỗi chapter, chúng ta sẽ gọi một Composable để vẽ nó
+            ChapterListItem(chapter = chapter)
+        }
+
         Log.d("DetailDebug", "Title: ${manga.attributes.title["en"]}")
         Log.d("DetailDebug", "Description: ${manga.attributes.description["en"]}")
 
+    }
+}
+
+@Composable
+fun ChapterListItem(chapter: MangaModels.ChapterData){
+    Card(modifier = Modifier
+        .clickable {  }
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+    {
+        val chapterNumber = chapter.attributes.chapter?: "N/A"
+        val chapterTitle = chapter.attributes.title?: ""
+        Text("Chapter $chapterNumber: $chapterTitle")
     }
 }
 
