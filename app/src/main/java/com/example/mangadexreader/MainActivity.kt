@@ -57,6 +57,7 @@ import com.example.mangadexreader.navigation.ScreenRoutes
 import com.example.mangadexreader.ui.detailscreen.MangaDetailScreen
 import com.example.mangadexreader.ui.mainscreen.MangaListUiState
 import com.example.mangadexreader.ui.mainscreen.MangaListViewModel
+import com.example.mangadexreader.ui.reader.ReaderScreen
 import com.example.mangadexreader.ui.theme.MangadexReaderTheme
 import kotlinx.coroutines.delay
 
@@ -83,11 +84,19 @@ class MainActivity : ComponentActivity() {
                             // 3. Truyền chính xác viewModel đã tạo vào màn hình
                             MangaListScreen(uiState = uiState, navController = navController, viewModel = mangaViewModel)
                         }
-
                         composable(
                             route = ScreenRoutes.MangaDetail,
-                            arguments = listOf(navArgument("mangaId"){type = NavType.StringType})){
+                            arguments = listOf(navArgument("mangaId") {type = NavType.StringType})){
                             MangaDetailScreen(navController = navController)
+                        }
+                        composable(
+                            route = ScreenRoutes.MangaReader,
+                            arguments = listOf(navArgument("chapterId") { type = NavType.StringType })
+                        ) {
+                            // Tạm thời đặt một màn hình giữ chỗ
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                ReaderScreen(navController = navController)
+                            }
                         }
                     }
                 }

@@ -31,4 +31,8 @@ class MangaRepository {
         val orderOptions = mapOf("order[chapter]" to "asc")
         return apiService.getChapterFeed(mangaId, orderOptions)
     }
+
+    suspend fun getReaderPages(chapterId: String): MangaModels.ReaderPageResponse {
+        return apiService.getReaderPages(chapterId)
+    }
 }

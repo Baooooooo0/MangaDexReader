@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.mangadexreader.data.MangaModels
+import com.example.mangadexreader.navigation.ScreenRoutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,8 +69,18 @@ fun MangaDetailScreen(navController: NavController){
     // Sửa ở đây: thêm .value
     when (val currentState = uiState.value) { // Dùng `val currentState` để code dễ đọc hơn
         is MangaDetailUiState.Loading -> LoadingState()
+
         // dùng currentState đã được gán giá trị
-        is MangaDetailUiState.Success -> SuccessState(manga = currentState.manga, chapterList = chapterList)
+        is MangaDetailUiState.Success -> SuccessState(
+            manga = currentState.manga,
+            chapterList = chapterList,
+            onChapterClick = { chapterId ->
+                navController.navigate(
+                    ScreenRoutes.MangaReader.replace("{chapterId}", chapterId)
+                )
+            }
+        )
+
         // dùng currentState đã được gán giá trị
         is MangaDetailUiState.Error -> ErrorState(message = currentState.message)
             }
@@ -88,7 +99,7 @@ fun LoadingState(){
 }
 
 @Composable
-fun SuccessState(manga: MangaModels.MangaData, chapterList: List<MangaModels.ChapterData>){
+fun SuccessState(manga: MangaModels.MangaData, chapterList: List<MangaModels.ChapterData>, onChapterClick: (String) -> Unit){
     val coverFileName = manga.coverFileName
     val imageUrl: String? =
         if (
@@ -132,7 +143,7 @@ fun SuccessState(manga: MangaModels.MangaData, chapterList: List<MangaModels.Cha
 
         chapterList.forEach { chapter ->
             // Với mỗi chapter, chúng ta sẽ gọi một Composable để vẽ nó
-            ChapterListItem(chapter = chapter)
+            ChapterListItem(chapter = chapter, onItemClick = onChapterClick)
         }
 
         Log.d("DetailDebug", "Title: ${manga.attributes.title["en"]}")
@@ -142,9 +153,9 @@ fun SuccessState(manga: MangaModels.MangaData, chapterList: List<MangaModels.Cha
 }
 
 @Composable
-fun ChapterListItem(chapter: MangaModels.ChapterData){
+fun ChapterListItem(chapter: MangaModels.ChapterData, onItemClick: (String) -> Unit){
     Card(modifier = Modifier
-        .clickable {  }
+        .clickable { onItemClick(chapter.id) }
         .fillMaxWidth()
         .padding(horizontal = 16.dp, vertical = 8.dp)
     )

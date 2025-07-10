@@ -1,6 +1,5 @@
 package com.example.mangadexreader.ui.mainscreen
 
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mangadexreader.repository.MangaRepository
@@ -10,6 +9,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MangaListViewModel : ViewModel() {
+
+    companion object {
+        private const val PAGE_SIZE = 20
+    }
+    private var currentOffset: Int = 0
+    private var canLoadMore: Boolean = true
 
     // Khởi tạo repository
     private val repository = MangaRepository()
@@ -22,18 +27,12 @@ class MangaListViewModel : ViewModel() {
 
     private val _searchQuery = MutableStateFlow<String>("")
 
-    public val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     // Khối init sẽ được gọi khi ViewModel được tạo lần đầu tiên
     init {
         fetchMangaList("")
     }
-
-    companion object {
-        private const val PAGE_SIZE = 20
-    }
-    private var currentOffset: Int = 0
-    private var canLoadMore: Boolean = true
 
     /**
      * Hàm để lấy dữ liệu truyện tranh.

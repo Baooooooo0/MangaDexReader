@@ -34,4 +34,10 @@ interface MangaApiService {
         @QueryMap options: Map<String, String>
     ): MangaModels.ChapterListResponse
 
+    @GET("/at-home/server/{id}")
+    suspend fun getReaderPages(
+        @Path("id") chapterId: String
+    ): MangaModels.ReaderPageResponse
+
+
 }
