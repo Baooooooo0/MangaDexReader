@@ -24,7 +24,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,7 +38,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,10 +51,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
 import com.example.mangadexreader.data.MangaModels
+import com.example.mangadexreader.navigation.BottomNavItem
 import com.example.mangadexreader.navigation.ScreenRoutes
 import com.example.mangadexreader.ui.detailscreen.MangaDetailScreen
 import com.example.mangadexreader.ui.mainscreen.MangaListUiState
@@ -70,40 +74,85 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    // Gọi Composable chính của màn hình, truyền vào trạng thái hiện tại
-                    NavHost(
-                        navController = navController,
-                        startDestination = ScreenRoutes.MangaList
-                    ){
-                        composable(route = ScreenRoutes.MangaList){
-                            // 1. Tạo ViewModel một lần duy nhất
-                            val mangaViewModel: MangaListViewModel = viewModel()
-                            // 2. Lấy state từ chính ViewModel đó
-                            val uiState by mangaViewModel.uiState.collectAsStateWithLifecycle()
-                            // 3. Truyền chính xác viewModel đã tạo vào màn hình
-                            MangaListScreen(uiState = uiState, navController = navController, viewModel = mangaViewModel)
-                        }
-                        composable(
-                            route = ScreenRoutes.MangaDetail,
-                            arguments = listOf(navArgument("mangaId") {type = NavType.StringType})){
-                            MangaDetailScreen(navController = navController)
-                        }
-                        composable(
-                            route = ScreenRoutes.MangaReader,
-                            arguments = listOf(navArgument("chapterId") { type = NavType.StringType })
-                        ) {
-                            // Tạm thời đặt một màn hình giữ chỗ
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                ReaderScreen(navController = navController)
-                            }
-                        }
-                    }
+                    MainScreen()
                 }
             }
         }
     }
 }
+
+@Composable
+fun MainScreen(){
+    val navController = rememberNavController()
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = navController)
+        }
+    ){ innerPadding ->
+        //NavHost
+        // Gọi Composable chính của màn hình, truyền vào trạng thái hiện tại
+        NavHost(
+            navController = navController,
+            startDestination = ScreenRoutes.MangaList,
+            modifier = Modifier.padding(innerPadding)
+        ){
+            composable(route = ScreenRoutes.MangaList){
+                // 1. Tạo ViewModel một lần duy nhất
+                val mangaViewModel: MangaListViewModel = viewModel()
+                // 2. Lấy state từ chính ViewModel đó
+                val uiState by mangaViewModel.uiState.collectAsStateWithLifecycle()
+                // 3. Truyền chính xác viewModel đã tạo vào màn hình
+                MangaListScreen(uiState = uiState, navController = navController, viewModel = mangaViewModel)
+            }
+            composable(
+                route = ScreenRoutes.MangaDetail,
+                arguments = listOf(navArgument("mangaId") {type = NavType.StringType})){
+                MangaDetailScreen(navController = navController)
+            }
+            composable(
+                route = ScreenRoutes.MangaReader,
+                arguments = listOf(navArgument("chapterId") { type = NavType.StringType })
+            ) {
+                // Tạm thời đặt một màn hình giữ chỗ
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    ReaderScreen(navController = navController)
+                }
+            }
+            composable("favorite_screen") {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("Màn hình Yêu thích sẽ ở đây")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavController){
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Favorite
+    )
+    NavigationBar {
+        items.forEach{ item ->
+            NavigationBarItem(
+                icon ={Icon(item.icon, contentDescription = item.title)},
+                label = { Text(item.title) },
+                selected = (currentRoute == item.route),
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Các tùy chọn điều hướng để tránh tạo ra một chồng màn hình lớn
+                        popUpTo(navController.graph.startDestinationId)
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+    }
+}
+
 
 /**
  * Composable chính, quyết định hiển thị gì dựa trên trạng thái của UI
