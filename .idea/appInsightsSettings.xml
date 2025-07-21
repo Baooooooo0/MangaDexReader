@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.mangadexreader" />
+                  <option name="mobileSdkAppId" value="1:680926930934:android:72f21182368a94fedfc9d7" />
+                  <option name="projectId" value="mangadexreader-f35b4" />
+                  <option name="projectNumber" value="680926930934" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

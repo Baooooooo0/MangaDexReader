@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22" // Đảm bảo phiên bản khớp với phiên bản Kotlin của bạn
 
@@ -81,4 +82,9 @@ dependencies {
 
     // Navigation cho Jetpack Compose
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 }

@@ -58,9 +58,12 @@ import coil.compose.AsyncImage
 import com.example.mangadexreader.data.MangaModels
 import com.example.mangadexreader.navigation.BottomNavItem
 import com.example.mangadexreader.navigation.ScreenRoutes
+import com.example.mangadexreader.ui.SplashScreen
+import com.example.mangadexreader.ui.authscreen.SignInScreen
 import com.example.mangadexreader.ui.detailscreen.MangaDetailScreen
 import com.example.mangadexreader.ui.mainscreen.MangaListUiState
 import com.example.mangadexreader.ui.mainscreen.MangaListViewModel
+import com.example.mangadexreader.ui.profile.ProfileScreen
 import com.example.mangadexreader.ui.reader.ReaderScreen
 import com.example.mangadexreader.ui.theme.MangadexReaderTheme
 import kotlinx.coroutines.delay
@@ -84,18 +87,42 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen(){
     val navController = rememberNavController()
+
+    // Lấy route hiện tại
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    // Tạo điều kiện
+    val shouldShowBottomBar = when (currentRoute) {
+        BottomNavItem.Home.route,
+        BottomNavItem.Profile.route,
+        BottomNavItem.Favorite.route -> true
+        else -> false
+    }
+
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController = navController)
+            // Chỉ hiển thị BottomBar khi điều kiện là true
+            if (shouldShowBottomBar) {
+                BottomNavigationBar(navController = navController)
+            }
         }
     ){ innerPadding ->
         //NavHost
         // Gọi Composable chính của màn hình, truyền vào trạng thái hiện tại
         NavHost(
             navController = navController,
-            startDestination = ScreenRoutes.MangaList,
+            startDestination = "splash_screen",
             modifier = Modifier.padding(innerPadding)
         ){
+            composable("splash_screen") {
+                SplashScreen(navController = navController)
+            }
+
+            composable("sign_in") {
+                SignInScreen(navController = navController)
+            }
+
             composable(route = ScreenRoutes.MangaList){
                 // 1. Tạo ViewModel một lần duy nhất
                 val mangaViewModel: MangaListViewModel = viewModel()
@@ -104,6 +131,11 @@ fun MainScreen(){
                 // 3. Truyền chính xác viewModel đã tạo vào màn hình
                 MangaListScreen(uiState = uiState, navController = navController, viewModel = mangaViewModel)
             }
+
+            composable("profile_screen") {
+                ProfileScreen(navController = navController)
+            }
+
             composable(
                 route = ScreenRoutes.MangaDetail,
                 arguments = listOf(navArgument("mangaId") {type = NavType.StringType})){
@@ -133,7 +165,8 @@ fun BottomNavigationBar(navController: NavController){
     val currentRoute = navBackStackEntry?.destination?.route
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Favorite
+        BottomNavItem.Favorite,
+        BottomNavItem.Profile
     )
     NavigationBar {
         items.forEach{ item ->

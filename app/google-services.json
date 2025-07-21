@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "680926930934",
+    "project_id": "mangadexreader-f35b4",
+    "storage_bucket": "mangadexreader-f35b4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:680926930934:android:72f21182368a94fedfc9d7",
+        "android_client_info": {
+          "package_name": "com.example.mangadexreader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "680926930934-2mvn7c610udtrl7jptruio8vnj72j6bh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mangadexreader",
+            "certificate_hash": "ec31f278ea55d2853d1c4cabbf692d1b794282a4"
+          }
+        },
+        {
+          "client_id": "680926930934-iji7chksi47p7na62k5njbp7c9b50n9j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7kMrUg_7KEkVUrkKDy7rg4O1_v7cIWS0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "680926930934-iji7chksi47p7na62k5njbp7c9b50n9j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
