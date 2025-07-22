@@ -88,6 +88,22 @@ class MangaModels {
         val baseUrl: String,
         val chapter: ChapterPages
     )
+
+    @Serializable
+    data class LoginRequest(
+        val idToken: String
+    )
+
+    @Serializable
+    data class LoginResponse(
+        val token: Token
+    ) {
+        @Serializable
+        data class Token(
+            val session: String, // Access Token
+            val refresh: String  // Refresh Token (dùng để lấy token mới khi hết hạn)
+        )
+    }
 }
 
 @Serializable

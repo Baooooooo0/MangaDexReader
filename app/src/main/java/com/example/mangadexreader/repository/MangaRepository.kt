@@ -35,4 +35,21 @@ class MangaRepository {
     suspend fun getReaderPages(chapterId: String): MangaModels.ReaderPageResponse {
         return apiService.getReaderPages(chapterId)
     }
+
+    suspend fun getFollowedManga(token: String): MangaModels.MangaListResponse {
+        // Thêm "Bearer " vào trước token là quy tắc của API
+        return apiService.getFollowedManga(token = "Bearer $token")
+    }
+
+    suspend fun followManga(token: String, mangaId: String) {
+        apiService.followManga(token = "Bearer $token", mangaId = mangaId)
+    }
+
+    suspend fun unfollowManga(token: String, mangaId: String) {
+        apiService.unfollowManga(token = "Bearer $token", mangaId = mangaId)
+    }
+
+    suspend fun loginWithGoogle(request: MangaModels.LoginRequest): MangaModels.LoginResponse {
+        return apiService.loginWithGoogle(request)
+    }
 }

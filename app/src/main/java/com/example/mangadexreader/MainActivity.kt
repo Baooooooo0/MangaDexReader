@@ -96,7 +96,7 @@ fun MainScreen(){
     val shouldShowBottomBar = when (currentRoute) {
         BottomNavItem.Home.route,
         BottomNavItem.Profile.route,
-        BottomNavItem.Favorite.route -> true
+        BottomNavItem.Bookmark.route -> true
         else -> false
     }
 
@@ -150,9 +150,10 @@ fun MainScreen(){
                     ReaderScreen(navController = navController)
                 }
             }
-            composable("favorite_screen") {
+
+            composable("bookmark_screen") {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Màn hình Yêu thích sẽ ở đây")
+                    Text("Màn hình Bookmark sẽ ở đây")
                 }
             }
         }
@@ -165,7 +166,7 @@ fun BottomNavigationBar(navController: NavController){
     val currentRoute = navBackStackEntry?.destination?.route
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Favorite,
+        BottomNavItem.Bookmark,
         BottomNavItem.Profile
     )
     NavigationBar {
@@ -197,7 +198,6 @@ fun MangaListScreen(uiState: MangaListUiState,
                     navController: NavController,
                     viewModel: MangaListViewModel
 ) {
-
     val listState = rememberLazyListState()
 
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
